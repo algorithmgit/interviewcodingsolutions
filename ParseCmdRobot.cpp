@@ -235,13 +235,13 @@ void parse(char c)
 using namespace std;
 
 
-struct packet { 
-  char header[4];
+struct packet {
+  string header;
   char length;
-  char cmd[7];
+  string cmd;
   char repeat;
   char checksum;
-} received_packet;
+} rcv_pkt;
 
 // YOU WILL NEED TO CALL THIS FUNCTION
 // Function for taking a string and creating a "checksum" in ASCII
@@ -311,190 +311,131 @@ int main() {
 // ------ Do not modify above this line ----------
 // ----------- Add your code below ---------------
 /************************************************/
-bool parse_header(char c, int *i){
-  if (c >= 'A' && c <= 'Z'){
-    received_packet.header[*i] = c;
-    *i = *i + 1;
-  }
-  else{
-    *i = 0;
-  }
+bool header_done   = false;
+bool length_done   = false;
+bool cmd_done      = false;
+bool repeat_done   = false;
+bool checksum_done = false;
 
-  if (*i == 4){
-    if(MSG_HEADER.compare(received_packet.header) == 0) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool parse_length(char c, int *i) {
-  
-  if (c >= '0' && c <= '9'){
-    received_packet.length = c;
-    *i = *i + 1;
-    return true;
-  }
-  else {
-    *i = 0;  
-  }
-
-  return false;
-}
-
-bool parse_repeat(char c, int *i){
-  
-  if (c >= '0' && c <= '9'){
-    received_packet.repeat = c;
-    *i = *i + 1;
-    //cout << "i = " << *i << " Building repeat = " << received_packet.repeat << endl;
-    return true;
-  }
-  else {
-    *i = 0;  
-  }
-  
-  return false;
-}
-
-bool parse_cmd(char c, int *i){
-  if (c >= 'A' && c <= 'Z'){
-    received_packet.cmd[*i] = c;
-    //cout << "i = " << i << " Building Cmd = " << received_packet.cmd << endl;
-    *i = *i + 1;
-  }
-  else{
-      *i = 0;
-  }
-
-  if (*i <= 7){
-    //cout << "i = " << i << " CMD Found = " << received_packet.cmd << endl;
-    if((MSG_LEFT.compare(0, 4, received_packet.cmd)    == 0)   || 
-       (MSG_RIGHT.compare(0, 5, received_packet.cmd)   == 0)   ||
-       (MSG_FORWARD.compare(0, 7, received_packet.cmd) == 0)   || 
-       (MSG_BEEP.compare(0, 4, received_packet.cmd)    == 0)
-      ){
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-bool parse_checksum(char c){
-  
-  received_packet.checksum = c;
-  return true;
-}
-
-int header_length = 0;
-int length_length = 0;
-int cmd_length    = 0;
-int repeat_length = 0;
-
-void build_packet(char c)
-{
-  static int i = 0;
-  static bool header_done   = false;
-  static bool length_done   = false;
-  static bool cmd_done      = false;
-  static bool repeat_done   = false;
-  static bool checksum_done = false;
-  
-  
-  if (header_done == false){
-    header_done = parse_header(c, &header_length);
-  }
-  
-  if(header_done == true && header_length == 4){
-        i++;
-        //cout << " i = " << i << "parsed Header = " << received_packet.header << endl;
-        header_length = 0;
-        return;
-  }
+void reset() {
+    rcv_pkt.header.clear();
+    rcv_pkt.cmd.clear();
     
-  if (header_done == true && length_done == false){
-    length_done = parse_length(c, &length_length);
-  }
-  
-  if(length_done == true && length_length == 1){
-        i++;
-        //cout << " i = " << i << "parsed length = " << received_packet.length << endl;
-        length_length = 0;
-        return;
-  }  
-  
-  if (length_done == true && cmd_done == false){
-    cmd_done = parse_cmd(c, &cmd_length);
-    //cout << "cmd_length = " << cmd_length << " received_packet.length " << received_packet.length << endl;
-  }
-  
-  //if(length_done == true && cmd_done == true) { 
-  // cout << "cmd_length = " << cmd_length << endl;
-  // cout << "received_packet.length - 1 = " << (received_packet.length - '0' - 1) << endl;
-  //}
-  
-  if((cmd_done == true) && (cmd_length == (received_packet.length - '0' - 1) )){
-        i++;
-        //cout << " i = " << i << "parsed cmd = " << received_packet.cmd << endl;
-        cmd_length = 0;
-        return;
-  }
-      
-  if (cmd_done == true && repeat_done == false){
-    repeat_done = parse_repeat(c, &repeat_length);
-    //cout << "repeat_length = " << repeat_length << " received_packet.repeat = " << received_packet.repeat << endl;
-  }
-  
-  if(repeat_done == true && repeat_length == 1 ){
-    i++;
-    //cout << " i = " << i << "parsed repeat = " << received_packet.repeat << endl;
-    repeat_length = 0;
-    return;
-  }
-  
-  if (repeat_done == true && checksum_done == false){
-    checksum_done = parse_checksum(c);
-    
-    //string pkt(received_packet.header);
-    string pkt;
-    pkt.append(1, received_packet.length);
-    pkt.append(received_packet.cmd);
-    pkt.append(1, received_packet.repeat);
-    //pkt.append(received_packet.checksum);
-    
-    char cs = checksum(pkt);
-    
-    //cout << " CS = " << cs << endl;
-    //cout << " Received_packet.checksum = " << received_packet.checksum << endl;
-    if (cs == received_packet.checksum){
-      i++;
-    }
-  }
-  
-  if( i == 5 ){
-    string cmd(received_packet.cmd);
-    int repeat = received_packet.repeat - '0';
-    
-    execute_packet_command(cmd, repeat);
-    i = 0;
     header_done   = false;
     length_done   = false;
     cmd_done      = false;
     repeat_done   = false;
     checksum_done = false;
-    header_length = 0;
-    length_length = 0;
-    cmd_length    = 0;
-    repeat_length = 0;
-  }
-  
-  return ; 
+    
+    return;
 }
+
+bool get_header(char c) {
+    rcv_pkt.header += c;
+    
+    size_t hdr_found;
+    if((hdr_found = rcv_pkt.header.find(MSG_HEADER)) != string::npos){
+        rcv_pkt.header = rcv_pkt.header.substr(hdr_found,MSG_HEADER.length());
+        //cout << " Header = " << rcv_pkt.header << endl;
+        return true;
+    }
+    
+    return false;
+}
+
+bool get_length(char c) {
+    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything
+                            //to do. Why procss than?
+        rcv_pkt.length = c;
+        //cout << " Length = " << rcv_pkt.length << endl;
+        return true;
+    }else {
+        //We did not receive a number after the header, reset.
+        reset();
+    }
+    return false;
+}
+
+bool get_cmd(char c) {
+    if (c >= '0' && c<= '9') {// command cannot start with digit
+        reset();
+        return false;
+    }
+    
+    rcv_pkt.cmd += c;
+    
+    if(rcv_pkt.cmd.length() > MSG_FORWARD.length()) {// A command cannot be
+                                                     // longer than the longest
+                                                     // cmd
+        reset();
+        return false;
+    }
+    
+    size_t cmd_found;
+    if(((cmd_found = rcv_pkt.cmd.find(MSG_LEFT)) != string::npos)    ||
+       ((cmd_found = rcv_pkt.cmd.find(MSG_RIGHT)) != string::npos)   ||
+       ((cmd_found = rcv_pkt.cmd.find(MSG_FORWARD)) != string::npos) ||
+       ((cmd_found = rcv_pkt.cmd.find(MSG_BEEP)) != string::npos)) {
+        if((rcv_pkt.cmd == MSG_LEFT)    ||
+           (rcv_pkt.cmd == MSG_RIGHT)   ||
+           (rcv_pkt.cmd == MSG_FORWARD) ||
+           (rcv_pkt.cmd == MSG_BEEP))  {
+            //cout << " Command = " << rcv_pkt.cmd << endl;
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool get_repeat(char c) {
+    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything
+                            //to do. Why procss than?
+        rcv_pkt.repeat = c;
+        //cout << " Repeat = " << rcv_pkt.repeat << endl;
+        return true;
+    }else {
+        //We did not receive a number after the cmd, reset.
+        reset();
+    }
+    return false;
+}
+
+void get_checksum(char c) {
+    rcv_pkt.checksum = c;
+    return;
+}
+
 
 void parse(char c){
-  build_packet(c);
+    if(!header_done)
+        header_done = get_header(c);
+    else if(!length_done) {
+        length_done = get_length(c);
+        if(!length_done) // restart from the Header?
+            header_done = get_header(c);
+    }
+    else if(!cmd_done)
+        cmd_done = get_cmd(c);
+    else if(!repeat_done) {
+        repeat_done = get_repeat(c);
+        if(!repeat_done) // restart from the Header ?
+            header_done = get_header(c);
+    }
+    else if(!checksum_done) {
+        get_checksum(c);
+        
+        string pkt;
+            pkt.append(1, rcv_pkt.length);
+            pkt.append(rcv_pkt.cmd);
+            pkt.append(1, rcv_pkt.repeat);
+        
+        char cs = checksum(pkt);
+        if (cs == rcv_pkt.checksum){
+            int repeat = rcv_pkt.repeat - '0';
+            
+            execute_packet_command(rcv_pkt.cmd, repeat);
+        }
+        reset();
+    }
 }
-
