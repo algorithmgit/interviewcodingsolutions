@@ -315,7 +315,6 @@ bool header_done   = false;
 bool length_done   = false;
 bool cmd_done      = false;
 bool repeat_done   = false;
-bool checksum_done = false;
 
 void reset() {
     rcv_pkt.header.clear();
@@ -325,7 +324,6 @@ void reset() {
     length_done   = false;
     cmd_done      = false;
     repeat_done   = false;
-    checksum_done = false;
     
     return;
 }
@@ -344,8 +342,8 @@ bool get_header(char c) {
 }
 
 bool get_length(char c) {
-    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything
-                            //to do. Why procss than?
+    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything 
+                            //to do. Why procss than? 
         rcv_pkt.length = c;
         //cout << " Length = " << rcv_pkt.length << endl;
         return true;
@@ -359,29 +357,29 @@ bool get_length(char c) {
 bool get_cmd(char c) {
     if (c >= '0' && c<= '9') {// command cannot start with digit
         reset();
-        return false;
+        return false; 
     }
     
     rcv_pkt.cmd += c;
     
-    if(rcv_pkt.cmd.length() > MSG_FORWARD.length()) {// A command cannot be
+    if(rcv_pkt.cmd.length() > MSG_FORWARD.length()) {// A command cannot be 
                                                      // longer than the longest
-                                                     // cmd
+                                                     // cmd 
         reset();
         return false;
     }
     
     size_t cmd_found;
-    if(((cmd_found = rcv_pkt.cmd.find(MSG_LEFT)) != string::npos)    ||
-       ((cmd_found = rcv_pkt.cmd.find(MSG_RIGHT)) != string::npos)   ||
-       ((cmd_found = rcv_pkt.cmd.find(MSG_FORWARD)) != string::npos) ||
+    if(((cmd_found = rcv_pkt.cmd.find(MSG_LEFT)) != string::npos)    || 
+       ((cmd_found = rcv_pkt.cmd.find(MSG_RIGHT)) != string::npos)   || 
+       ((cmd_found = rcv_pkt.cmd.find(MSG_FORWARD)) != string::npos) || 
        ((cmd_found = rcv_pkt.cmd.find(MSG_BEEP)) != string::npos)) {
-        if((rcv_pkt.cmd == MSG_LEFT)    ||
+        if((rcv_pkt.cmd == MSG_LEFT)    || 
            (rcv_pkt.cmd == MSG_RIGHT)   ||
            (rcv_pkt.cmd == MSG_FORWARD) ||
            (rcv_pkt.cmd == MSG_BEEP))  {
             //cout << " Command = " << rcv_pkt.cmd << endl;
-            return true;
+            return true;        
         }
     }
     
@@ -389,8 +387,8 @@ bool get_cmd(char c) {
 }
 
 bool get_repeat(char c) {
-    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything
-                            //to do. Why procss than?
+    if(c >'0' && c <= '9') {//if length is 0, we basically do not have anything 
+                            //to do. Why procss than? 
         rcv_pkt.repeat = c;
         //cout << " Repeat = " << rcv_pkt.repeat << endl;
         return true;
@@ -422,7 +420,7 @@ void parse(char c){
         if(!repeat_done) // restart from the Header ?
             header_done = get_header(c);
     }
-    else if(!checksum_done) {
+    else { // We are at the checksum
         get_checksum(c);
         
         string pkt;
