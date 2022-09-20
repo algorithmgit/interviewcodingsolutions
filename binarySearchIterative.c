@@ -14,8 +14,6 @@ int main () {
   left = 0;; 
   right = (sizeof(arr) / sizeof(int)) - 1; 
   
-  printf("left = %d, right = %d\n", left, right);
-  
   while(left <= right) { 
     mid = left + (right - left) / 2; 
     
