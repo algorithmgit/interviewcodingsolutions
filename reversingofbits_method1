@@ -28,3 +28,36 @@ i/p 0000 0000 0000 0000 0000 0000 0000 0111
 o/p 1110 0000 0000 0000 0000 0000 0000 0000
 
 */
+
+/*  
+uint8_t solution 
+
+#include <stdio.h>
+#include <stdint.h>
+
+uint8_t reversethebits(uint8_t x){
+  x = ((( x & 0xaa) >> 1) | ((x & 0x55) << 1)); 
+  x = ((( x & 0xcc) >> 2) | ((x & 0x33) << 2)); 
+  //x = ((( x & 0xf0) >> 4) | ((x & 0x0f) << 4)); 
+  return ((x>> 4) | (x << 4));
+}
+
+int main(){
+ uint8_t num = 0x7;
+ 
+ printf("Reverse of %X is %X\n", num, reversethebits(num));
+ 
+ return 0;
+}
+
+/*Expredted output 
+
+Reverse of 7 is E0
+
+i.e. 
+i/p 0000 0111
+o/p 1110 0000
+
+*/
+
+*/
