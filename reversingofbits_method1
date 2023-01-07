@@ -38,7 +38,6 @@ uint8_t solution
 uint8_t reversethebits(uint8_t x){
   x = ((( x & 0xaa) >> 1) | ((x & 0x55) << 1)); 
   x = ((( x & 0xcc) >> 2) | ((x & 0x33) << 2)); 
-  //x = ((( x & 0xf0) >> 4) | ((x & 0x0f) << 4)); 
   return ((x>> 4) | (x << 4));
 }
 
