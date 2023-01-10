@@ -1,0 +1,62 @@
+
+#include <stdio.h>
+#include <stdint.h>
+
+uint32_t reversethebits(uint32_t x){
+  x = ((( x & 0xaaaaaaaa) >> 1) | ((x & 0x55555555) << 1)); 
+  x = ((( x & 0xcccccccc) >> 2) | ((x & 0x33333333) << 2)); 
+  x = ((( x & 0xf0f0f0f0) >> 4) | ((x & 0x0f0f0f0f) << 4)); 
+  x = ((( x & 0xff00ff00) >> 8) | ((x & 0x00ff00ff) << 8)); 
+  return ((x>> 16) | (x << 16));
+  
+}
+
+int main(){
+ uint32_t num = 0x7;
+ 
+ printf("Reverse of %X is %X\n", num, reversethebits(num));
+ 
+ return 0;
+}
+
+/*Expredted output 
+
+Reverse of 7 is E0000000
+
+i.e. 
+i/p 0000 0000 0000 0000 0000 0000 0000 0111
+o/p 1110 0000 0000 0000 0000 0000 0000 0000
+
+*/
+
+/*  
+uint8_t solution 
+
+#include <stdio.h>
+#include <stdint.h>
+
+uint8_t reversethebits(uint8_t x){
+  x = ((( x & 0xaa) >> 1) | ((x & 0x55) << 1)); 
+  x = ((( x & 0xcc) >> 2) | ((x & 0x33) << 2)); 
+  return ((x>> 4) | (x << 4));
+}
+
+int main(){
+ uint8_t num = 0x7;
+ 
+ printf("Reverse of %X is %X\n", num, reversethebits(num));
+ 
+ return 0;
+}
+
+/*Expredted output 
+
+Reverse of 7 is E0
+
+i.e. 
+i/p 0000 0111
+o/p 1110 0000
+
+*/
+
+*/
