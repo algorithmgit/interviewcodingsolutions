@@ -18,8 +18,9 @@ Do not ignore any characters other than the leading whitespace or the rest of th
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 
-int myAtoi(const char* s) {
+int myAtoi(char* s) {
   // NULL Pointer check 
   if (!s) return INT_MAX; 
   
@@ -30,17 +31,16 @@ int myAtoi(const char* s) {
   while(s[i] == ' ') i++;
 
   // Sign checks
-  if(s[i] == '-') { sign = -1; i++;}
-  if(s[i] == '+') { sign = 1; i++;}
-
-  while(s[i] != '\0'){
+  if(s[i] == '-') { sign = -1;i++;}
+  else if(s[i] == '+') { sign = 1;i++;}
+  
+  while((s[i] != '\0') && isdigit(s[i])){
     digit = s[i] - '0';
-    if(digit >= 0 && digit <= 9){
-      if((result > INT_MAX / 10) || (result == INT_MAX && digit > INT_MAX % 10))
+    
+    if((result > INT_MAX / 10) || (result == INT_MAX / 10 && digit > INT_MAX % 10))
         return (sign == -1 ? INT_MIN : INT_MAX);
       
-      result = result * 10 + digit;
-    }
+    result = 10 * result + digit;
     i++;
   }
 
@@ -57,6 +57,11 @@ int main()
     printf(" maxlength = %d\n", myAtoi(""));
     printf(" maxlength = %d\n", myAtoi(str));
     printf(" maxlength = %d\n", myAtoi("1234"));
+    printf(" maxlength = %d\n", myAtoi("Words are 987"));
+    printf(" maxlength = %d\n", myAtoi("4193 with words")); 
+    printf(" maxlength = %d\n", myAtoi("3.14159"));
+    printf(" maxlength = %d\n", myAtoi("-+12"));
+    printf(" maxlength = %d\n", myAtoi("+1"));
 
     return 0;
 }
@@ -69,4 +74,9 @@ int main()
  maxlength = 0
  maxlength = 2147483647
  maxlength = 1234
+ maxlength = 0
+ maxlength = 4193
+ maxlength = 3
+ maxlength = 0
+ maxlength = 1
 */
