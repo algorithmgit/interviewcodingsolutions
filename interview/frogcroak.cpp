@@ -8,7 +8,7 @@ int minNumberOfFrogs(string croakOfFrogs) {
         auto n = string("croak").find(ch);
         ++cnt[n];
         if (n == 0){
-            max_frogs++;++frogs;// = max(++max_frogs, ++frogs);
+            max_frogs = max(max_frogs, ++frogs);
         }
         else if (--cnt[n - 1] < 0)
             return -1;
@@ -29,7 +29,7 @@ int main()
 
 
 /* Output : 
-frogs = 2
+frogs = 1
 frogs = 2
 frogs = -1
 */
