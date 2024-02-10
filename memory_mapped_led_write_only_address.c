@@ -5,7 +5,7 @@ in cannot be read from. It's write-only. Modify your function to account for thi
 #define LED_ADDRESS 0x1234 
 
 uint8_t toggle_led(uint8_t ledposition){
-  static uint18_t LED_REG_VAL = 0; // on boot the register is zero
+  static uint8_t LED_REG_VAL = 0; // on boot the register is zero
   
   LED_REG_VAL = LED_REG_VAL ^ (1 << ledposition);
   (*(volatile uint8_t *)LED_ADDRESS) = LED_REG_VAL;
