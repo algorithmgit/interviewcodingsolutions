@@ -23,7 +23,6 @@
 
 #define MAX_MOVES 100
 
-// Enumeration for chess pieces
 typedef enum {
     EMPTY,
     PAWN,
@@ -34,28 +33,25 @@ typedef enum {
     KING
 } ChessPiece;
 
-// Structure to represent a chess move
+// Define bitfields to save memory
 typedef struct {
-    ChessPiece piece;
-    int start_row;
-    int start_col;
-    int end_row;
-    int end_col;
+    unsigned int piece : 3; // Using 3 bits to represent 7 different ChessPiece values
+    unsigned int start_row : 4; // Assuming board rows can be represented in 4 bits (0-15)
+    unsigned int start_col : 4; // Assuming board columns can be represented in 4 bits (0-15)
+    unsigned int end_row : 4; // Assuming board rows can be represented in 4 bits (0-15)
+    unsigned int end_col : 4; // Assuming board columns can be represented in 4 bits (0-15)
 } ChessMove;
 
-// Array to store recorded moves
 ChessMove moves[MAX_MOVES];
 int num_moves = 0;
 
-// Function to record a move
 void recordMove(ChessMove move) {
     if (num_moves < MAX_MOVES) {
         moves[num_moves] = move;
         num_moves++;
         printf("Move recorded: %d from (%d, %d) to (%d, %d)\n", move.piece, move.start_row, move.start_col, move.end_row, move.end_col);
-    } else {
+    } else
         printf("Cannot record move. Maximum moves reached.\n");
-    }
 }
 
 int main() {
@@ -71,6 +67,7 @@ int main() {
 
     return 0;
 }
+
 
 /* Output 
 Move recorded: 3 from (1, 2) to (3, 3)
